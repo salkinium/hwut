@@ -2,8 +2,8 @@
 // Please modify the corresponding 'runner_hosted.cpp.in' file instead.
 // ----------------------------------------------------------------------------
 
-#include <unittest/reporter.hpp>
-#include <unittest/controller.hpp>
+#include <hwut/reporter.hpp>
+#include <hwut/controller.hpp>
 
 #include <xpcc/debug/logger.hpp>
 #include <xpcc/architecture/platform.hpp>
@@ -33,13 +33,13 @@ ${names}
 int
 main(void)
 {
-	unittest::Reporter reporter(outputDevice);
-	unittest::Controller::instance().setReporter(reporter);
+	hwut::Reporter reporter(outputDevice);
+	hwut::Controller::instance().setReporter(reporter);
 
 	// run tests
 ${tests}
 
-	unittest::Controller::instance().getReporter().printSummary();
+	hwut::Controller::instance().getReporter().printSummary();
 
 	return 0;
 }

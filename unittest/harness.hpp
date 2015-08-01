@@ -1,35 +1,27 @@
-// coding: utf-8
-// ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
- * All rights reserved.
+/*
+ * harness.hpp
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * Copyright (c) 2009-2015, Roboterclub Aachen e.V.
  *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
+ * This file is part of hwut.
  *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * hwut is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * hwut is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with hwut.  If not, see <http://www.gnu.org/licenses/>.
  */
-// ----------------------------------------------------------------------------
 
-#ifndef	UNITTEST__HARNESS_HPP
-#define	UNITTEST__HARNESS_HPP
+
+#ifndef	HWUT_HARNESS_HPP
+#define	HWUT_HARNESS_HPP
 
 #include "controller.hpp"
 
@@ -40,14 +32,14 @@
 /**
  * \brief	Verify (expr) is true
  * 
- * \ingroup	unittest
+ * \ingroup	hwut
  */
 #define	TEST_ASSERT_TRUE(expr)
 
 /**
  * \brief	Verify (expr) is false
  * 
- * \ingroup	unittest
+ * \ingroup	hwut
  */
 #define	TEST_ASSERT_FALSE(expr)
 
@@ -56,13 +48,13 @@
  * 
  * Shortcut with extended output message for `TEST_ASSERT_TRUE(x == y);`
  * 
- * \ingroup	unittest
+ * \ingroup	hwut
  */
 #define	TEST_ASSERT_EQUALS(x, y)
 
 /**
  * \brief	Verify (x==y) for floating point values
- * \ingroup	unittest
+ * \ingroup	hwut
  */
 #define	TEST_ASSERT_EQUALS_FLOAT(x, y)
 
@@ -71,13 +63,13 @@
  *
  * This macro verifies two values are equal up to a delta
  * 
- * \ingroup	unittest
+ * \ingroup	hwut
  */
 #define	TEST_ASSERT_EQUALS_DELTA(x, y, d)
 
 /**
  * \brief	Verify (lower <= value <= upper)
- * \ingroup	unittest
+ * \ingroup	hwut
  */
 #define	TEST_ASSERT_EQUALS_RANGE(value, lower, upper)
 
@@ -86,13 +78,13 @@
  * 
  * start is optional (default = 0).
  * 
- * \ingroup	unittest
+ * \ingroup	hwut
  */
 #define	TEST_ASSERT_EQUALS_ARRAY(array1, array2, count, start)
 
 /**
  * \brief	Fail unconditionally  
- * \ingroup	unittest
+ * \ingroup	hwut
  */
 #define	TEST_FAIL(msg)
 
@@ -100,7 +92,7 @@
 
 #include <xpcc/architecture/driver/accessor/flash.hpp>
 
-namespace unittest
+namespace hwut
 {
 	EXTERN_FLASH_STORAGE_STRING(stringEqual);
 	EXTERN_FLASH_STORAGE_STRING(stringNotInRange);
@@ -108,15 +100,15 @@ namespace unittest
 	EXTERN_FLASH_STORAGE_STRING(stringNotFalse);
 }
 
-#ifdef	UNITTEST__RETURN_ON_FAIL
+#ifdef	HWUT_RETURN_ON_FAIL
 	#define	TEST_RETURN__(x)	do { if (!x) { return; } } while (0)
 #else
 	#define	TEST_RETURN__(x)	x
 #endif
 
-#define	TEST_REPORTER__		unittest::Controller::instance().getReporter()
+#define	TEST_REPORTER__		hwut::Controller::instance().getReporter()
 
-namespace unittest
+namespace hwut
 {
 	// ------------------------------------------------------------------------
 	bool
@@ -137,7 +129,7 @@ namespace unittest
 		}
 		else {
 			TEST_REPORTER__.reportFailure(line)
-				<< a << xpcc::accessor::asFlash(unittest::stringEqual) << b << '\n';
+				<< a << xpcc::accessor::asFlash(hwut::stringEqual) << b << '\n';
 			return false;
 		}
 	}
@@ -153,7 +145,7 @@ namespace unittest
 		}
 		else {
 			TEST_REPORTER__.reportFailure(line)
-				<< a << xpcc::accessor::asFlash(unittest::stringEqual) << b << '\n';
+				<< a << xpcc::accessor::asFlash(hwut::stringEqual) << b << '\n';
 			return false;
 		}
 	}
@@ -169,7 +161,7 @@ namespace unittest
 		}
 		else {
 			TEST_REPORTER__.reportFailure(line)
-				<< value << xpcc::accessor::asFlash(unittest::stringNotInRange)
+				<< value << xpcc::accessor::asFlash(hwut::stringNotInRange)
 				<< '[' << lower << ',' << upper << ']' << '\n';
 			return false;
 		}
@@ -214,25 +206,25 @@ namespace unittest
 }
 
 #define	TEST_ASSERT_TRUE(expr)	\
-	TEST_RETURN__(::unittest::checkExpression((expr), __LINE__))
+	TEST_RETURN__(::hwut::checkExpression((expr), __LINE__))
 
 #define	TEST_ASSERT_FALSE(expr)	\
-	TEST_RETURN__(::unittest::checkExpression(!static_cast<bool>(expr), __LINE__))
+	TEST_RETURN__(::hwut::checkExpression(!static_cast<bool>(expr), __LINE__))
 
 #define	TEST_ASSERT_EQUALS(x, y) \
-	TEST_RETURN__(::unittest::checkEqual((x), (y), __LINE__))
+	TEST_RETURN__(::hwut::checkEqual((x), (y), __LINE__))
 
 #define	TEST_ASSERT_EQUALS_FLOAT(x, y) \
-	TEST_RETURN__(::unittest::checkEqual(static_cast<float>(x), static_cast<float>(y), __LINE__))
+	TEST_RETURN__(::hwut::checkEqual(static_cast<float>(x), static_cast<float>(y), __LINE__))
 
 #define	TEST_ASSERT_EQUALS_DELTA(x, y, d) \
-	TEST_RETURN__(::unittest::checkEqualDelta((x), (y), (d), __LINE__))
+	TEST_RETURN__(::hwut::checkEqualDelta((x), (y), (d), __LINE__))
 
 #define	TEST_ASSERT_EQUALS_RANGE(value, lower, upper) \
-	TEST_RETURN__(::unittest::checkRange((value), (lower), (upper), __LINE__))
+	TEST_RETURN__(::hwut::checkRange((value), (lower), (upper), __LINE__))
 
 #define	TEST_ASSERT_EQUALS_ARRAY(x, y, ...) \
-	TEST_RETURN__(::unittest::checkArray((x), (y), __LINE__, __VA_ARGS__))
+	TEST_RETURN__(::hwut::checkArray((x), (y), __LINE__, __VA_ARGS__))
 
 #define	TEST_FAIL(msg) \
 	do {	TEST_REPORTER__.reportFailure(__LINE__) \
@@ -242,4 +234,4 @@ namespace unittest
 
 #endif	// __DOXYGEN__
 
-#endif	// UNITTEST__HARNESS_HPP
+#endif	// HWUT_HARNESS_HPP

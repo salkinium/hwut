@@ -1,69 +1,60 @@
-// coding: utf-8
-// ----------------------------------------------------------------------------
-/* Copyright (c) 2009, Roboterclub Aachen e.V.
- * All rights reserved.
+/*
+ * count_type.hpp
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * Copyright (c) 2009-2015, Roboterclub Aachen e.V.
  *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Roboterclub Aachen e.V. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
+ * This file is part of hwut.
  *
- * THIS SOFTWARE IS PROVIDED BY ROBOTERCLUB AACHEN E.V. ''AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ROBOTERCLUB AACHEN E.V. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * hwut is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * hwut is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with hwut.  If not, see <http://www.gnu.org/licenses/>.
  */
-// ----------------------------------------------------------------------------
 
-#ifndef UNITTEST__COUNT_TYPE_HPP
-#define UNITTEST__COUNT_TYPE_HPP
+#ifndef HWUT_COUNT_TYPE_HPP
+#define HWUT_COUNT_TYPE_HPP
 
 #include <cstddef>
 #include <stdint.h>
 
-namespace unittest
+namespace hwut
 {
 	/**
 	 * \brief	Data type to count the number of constructor etc. calls
 	 * 
-	 * \ingroup	unittest
+	 * \ingroup	hwut
 	 */
 	class CountType
 	{
 	public:
 		CountType();
-		
+
 		CountType(const CountType& other);
-		
+
 		~CountType();
-		
+
 		CountType&
 		operator = (const CountType& other);
-		
+
 		static void
 		reset();
-		
+
 		static std::size_t numberOfDefaultConstructorCalls;
 		static std::size_t numberOfCopyConstructorCalls;
 		static std::size_t numberOfAssignments;
 		static std::size_t numberOfDestructorCalls;
 		static std::size_t numberOfReallocs;
-		
+
 		static std::size_t numberOfOperations;
 	};
 }
 
-#endif // UNITTEST__COUNT_TYPE_HPP
+#endif // HWUT_COUNT_TYPE_HPP
