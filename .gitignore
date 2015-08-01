@@ -1,2 +1,6 @@
+# scons
 build/
 .sconsign.dblite
+
+# python
+*.pyc

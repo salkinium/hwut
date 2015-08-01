@@ -1,4 +1,4 @@
-env = Environment(tools = ['xpcc'], toolpath = ['../../xpcc/scons/site_tools'],
+env = Environment(tools = ['unittest', 'xpcc'], toolpath = ['../../scons','../../xpcc/scons/site_tools'],
 	configfile = 'unittest_hosted.cfg')
 
 # build the xpcc library
