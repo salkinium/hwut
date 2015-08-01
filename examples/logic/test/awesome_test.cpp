@@ -30,4 +30,12 @@ AwesomeTest::testGetterSetter()
 
 	awesome.setValue(42);
 	TEST_ASSERT_EQUALS(awesome.getValue(), 42);
+	TEST_ASSERT_EQUALS(awesome.getValue(), 43);
+	TEST_ASSERT_EQUALS_DELTA(awesome.getValue(), 43, 0.2);
+
+	TEST_ASSERT_EQUALS_RANGE(awesome.getValue(), 40, 45);
+	TEST_ASSERT_EQUALS_RANGE(awesome.getValue() - 10, 40, 45);
+
+	TEST_ASSERT_TRUE(awesome.getValue() == 43);
+	TEST_ASSERT_FALSE(awesome.getValue() == 42);
 }
