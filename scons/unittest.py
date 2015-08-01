@@ -89,6 +89,11 @@ def generateClassName(s):
 def unittest_action(target, source, env):
 	if not env.has_key('template'):
 		raise SCons.Errors.UserError, "Use 'UnittestRunner(..., template = ...)'"
+	try:
+		import jinja2
+	except ImportError:
+		env.Error("To use this functionality you need to install the jinja2 template engine")
+		Exit(1)
 
 	template = env['template']
 	header = source
@@ -142,7 +147,7 @@ def unittest_action(target, source, env):
 	}
 
 	input = open(os.path.abspath(template), 'r').read()
-	output = string.Template(input).safe_substitute(substitutions)
+	output = jinja2.Template(input).render(substitutions).encode('utf-8')
 	open(target[0].abspath, 'w').write(output)
 
 	return 0

@@ -26,9 +26,9 @@ xpcc::log::StyleWrapper< xpcc::log::Prefix< char[10] > > loggerDeviceError( \
 		xpcc::log::Prefix< char[10] >("Error  : ", outputDevice ));
 xpcc::log::Logger xpcc::log::error(loggerDeviceError);
 
-${includes}
+{{includes}}
 
-${names}
+{{names}}
 
 int
 main(void)
@@ -37,7 +37,7 @@ main(void)
 	hwut::Controller::instance().setReporter(reporter);
 
 	// run tests
-${tests}
+{{tests}}
 
 	hwut::Controller::instance().getReporter().printSummary();
 
