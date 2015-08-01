@@ -44,10 +44,10 @@ main(void)
 	GpioA3::connect(Uart::Rx);
 	Uart::initialize<defaultSystemClock, Uart::Baudrate::B115200>(9);
 
-	device.write("Unittests (" __DATE__ ", " __TIME__")\n");
-
 	hwut::Reporter reporter(device);
 	hwut::Controller::instance().setReporter(reporter);
+
+	reporter.initialize();
 
 	// run tests
 {{tests}}

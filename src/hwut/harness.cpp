@@ -25,34 +25,43 @@
 namespace hwut
 {
 	FLASH_STORAGE_STRING(stringEqual) = " == ";
+	FLASH_STORAGE_STRING(stringDelta) = " ~ ";
 	FLASH_STORAGE_STRING(stringNotInRange) = " not in range ";
-	FLASH_STORAGE_STRING(stringNotTrue) = "true == false\n";
+	FLASH_STORAGE_STRING(stringFailBodyExpression) = "Expression not ";
+	FLASH_STORAGE_STRING(stringFailBodyEqual) = " not equal";
+	FLASH_STORAGE_STRING(stringFailBodyEqualFloat) = " with float eplison'\n";
+	FLASH_STORAGE_STRING(stringFailBodyEqualDelta) = " with delta ";
+	FLASH_STORAGE_STRING(stringFailBodyEnd) = "'\n";
 }
 
 bool
-hwut::checkExpression(bool expr, unsigned int line)
+hwut::checkExpression(bool expr, bool expected, unsigned int line, xpcc::accessor::Flash<char> checkString)
 {
-	if (expr) {
-		TEST_REPORTER__.reportPass();
+	if (expr == expected) {
+		TEST_REPORTER__.reportPass(checkString) << xpcc::endl;
 		return true;
 	} else {
-		TEST_REPORTER__.reportFailure(line)
-			<< xpcc::accessor::asFlash(hwut::stringNotTrue);
+		TEST_REPORTER__.reportFailure(checkString, line)
+			<< xpcc::accessor::asFlash(hwut::stringFailBodyExpression)
+			<< expected
+			<< xpcc::accessor::asFlash(hwut::stringFailBodyEnd);
 		return false;
 	}
 }
 
 bool
-hwut::checkEqual(const float& a, const float& b, unsigned int line)
+hwut::checkEqual(const float& a, const float& b, unsigned int line, xpcc::accessor::Flash<char> checkString)
 {
 	if (((a + TEST_FLOAT_EPISLON) >= b) and ((a - TEST_FLOAT_EPISLON) <= b))
 	{
-		TEST_REPORTER__.reportPass();
+		TEST_REPORTER__.reportPass(checkString) << xpcc::endl;
 		return true;
 	}
 	else {
-		TEST_REPORTER__.reportFailure(line)
-			<< a << xpcc::accessor::asFlash(hwut::stringEqual) << b << '\n';
+		TEST_REPORTER__.reportFailure(checkString, line)
+			<< a << xpcc::accessor::asFlash(hwut::stringEqual) << b
+				<< xpcc::accessor::asFlash(hwut::stringFailBodyEqual)
+			<< xpcc::accessor::asFlash(hwut::stringFailBodyEqualFloat);
 		return false;
 	}
 }
