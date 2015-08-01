@@ -28,9 +28,9 @@ typedef SystemClock<Pll<ExternalClock<MHz8>, MHz72> > defaultSystemClock;
 using Uart = Usart2;
 xpcc::IODeviceWrapper<Uart, xpcc::IOBuffer::BlockIfFull> device;
 
-${includes}
+{{includes}}
 
-${names}
+{{names}}
 
 int
 main(void)
@@ -50,7 +50,7 @@ main(void)
 	hwut::Controller::instance().setReporter(reporter);
 
 	// run tests
-${tests}
+{{tests}}
 
 	hwut::Controller::instance().getReporter().printSummary();
 
