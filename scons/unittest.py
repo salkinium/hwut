@@ -148,6 +148,9 @@ def unittest_action(target, source, env):
 	return 0
 
 def unittest_emitter(target, source, env):
+	if not env.has_key('template'):
+		raise SCons.Errors.UserError, "Use 'UnittestRunner(..., template = ...)'"
+	Depends(target, env['template'])
 	try:
 		Depends(target, SCons.Node.Python.Value(env['ARCHITECTURE']))
 	except KeyError:
