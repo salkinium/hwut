@@ -1,5 +1,5 @@
 env = Environment(tools = ['unittest', 'xpcc'], toolpath = ['../../scons','../../xpcc/scons/site_tools'],
-	configfile = 'unittest_hosted.cfg')
+	configfile = 'unittest_stm32f303.cfg')
 
 # build the xpcc library
 xpccLibrary = env.XpccLibrary()
@@ -9,7 +9,7 @@ hwut = env.Library('hwut', env.FindFiles(path='../../src/hwut').sources)
 
 files = env.FindFiles(path = '.', unittest=True)
 # declare a file which later runs all the tests
-template = '../../src/hwut/runner/runner_hosted.cpp.in'
+template = ARGUMENTS.get('template', env['XPCC_CONFIG']['build']['template'])
 runner = env.UnittestRunner(target = env.Buildpath('runner.cpp'),
 							source = files.header,
 							template = template)
@@ -19,13 +19,14 @@ sources = [runner] + files.sources
 # build the program
 program = env.Program(target = 'executable', source = sources + hwut)
 
-env.Alias('build', program)
+env.Alias('build', [env.Listing(program)])
 env.Alias('size', env.Size(program))
 env.Alias('symbols', env.Symbols(program))
 env.Alias('defines', env.ShowDefines())
+env.Alias('program', env.OpenOcd(program))
 
 env.Alias('run', env.Run(program))
-env.Alias('all', ['build', 'run'])
+env.Alias('all', ['build', 'size'])
 
 
 env.Default('all')

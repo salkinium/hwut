@@ -1,0 +1,62 @@
+// WARNING: This file is generated automatically, do not edit!
+// Please modify the corresponding 'runner_hosted.cpp.in' file instead.
+// ----------------------------------------------------------------------------
+
+#include <hwut/reporter.hpp>
+#include <hwut/controller.hpp>
+
+#include <xpcc/debug/logger.hpp>
+#include <xpcc/architecture/platform.hpp>
+
+using namespace xpcc::stm32;
+
+typedef GpioOutputE9  LedNorth;
+typedef GpioOutputE10 LedNorthEast;
+typedef GpioOutputE11 LedEast;
+typedef GpioOutputE12 LedSouthEast;
+typedef GpioOutputE13 LedSouth;
+typedef GpioOutputE14 LedSouthWest;
+typedef GpioOutputE15 LedWest;
+typedef GpioOutputE8  LedNorthWest;
+typedef GpioOutputA8  ClockOut;
+typedef GpioInputA0   Button;
+
+/// STM32F3 running at 72MHz generated from the external 8MHz clock
+/// supplied by the on-board st-link
+typedef SystemClock<Pll<ExternalClock<MHz8>, MHz72> > defaultSystemClock;
+
+using Uart = Usart2;
+xpcc::IODeviceWrapper<Uart, xpcc::IOBuffer::BlockIfFull> device;
+
+${includes}
+
+${names}
+
+int
+main(void)
+{
+	defaultSystemClock::enable();
+	xpcc::cortex::SysTickTimer::enable();
+
+	LedNorth::setOutput(xpcc::Gpio::High);
+
+	GpioA2::connect(Uart::Tx);
+	GpioA3::connect(Uart::Rx);
+	Uart::initialize<defaultSystemClock, Uart::Baudrate::B115200>(9);
+
+	device.write("Unittests (" __DATE__ ", " __TIME__")\n");
+
+	hwut::Reporter reporter(device);
+	hwut::Controller::instance().setReporter(reporter);
+
+	// run tests
+${tests}
+
+	hwut::Controller::instance().getReporter().printSummary();
+
+	while (1)
+	{
+		LedNorth::toggle();
+		xpcc::delayMilliseconds(500);
+	}
+}
