@@ -95,11 +95,10 @@ def unittest_action(target, source, env):
 		env.Error("To use this functionality you need to install the jinja2 template engine")
 		Exit(1)
 
-	template = env['template']
-	header = source
+	(template_path, template) = os.path.split(os.path.abspath(env['template']))
 
 	tests = {}
-	for file in header:
+	for file in source:
 		# io_stream_test.hpp -> io_stream_test
 		basename = os.path.splitext(file.name)[0]
 
@@ -146,8 +145,12 @@ def unittest_action(target, source, env):
 		'tests': '\n'.join(tests_cases),
 	}
 
-	input = open(os.path.abspath(template), 'r').read()
-	output = jinja2.Template(input).render(substitutions).encode('utf-8')
+
+	jinja = jinja2.Environment(loader=jinja2.FileSystemLoader(template_path))
+	# Jinja2 Line Statements
+	jinja.line_statement_prefix = '%%'
+	jinja.line_comment_prefix = '%#'
+	output = jinja.get_template(template).render(substitutions).encode('utf-8')
 	open(target[0].abspath, 'w').write(output)
 
 	return 0
