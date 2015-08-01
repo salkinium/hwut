@@ -4,9 +4,12 @@ env = Environment(tools = ['unittest', 'xpcc'], toolpath = ['../../scons','../..
 # build the xpcc library
 xpccLibrary = env.XpccLibrary()
 
+env.AppendUnique(CPPPATH = '../../src')
+hwut = env.Library('hwut', env.FindFiles(path='../../src/hwut').sources)
+
 files = env.FindFiles(path = '.', unittest=True)
 # declare a file which later runs all the tests
-template = ARGUMENTS.get('template', env['XPCC_CONFIG']['build']['template'])
+template = '../../src/hwut/runner/runner_hosted.cpp.in'
 runner = env.UnittestRunner(target = env.Buildpath('runner.cpp'),
 							source = files.header,
 							template = template)
@@ -14,7 +17,7 @@ runner = env.UnittestRunner(target = env.Buildpath('runner.cpp'),
 sources = [runner] + files.sources
 
 # build the program
-program = env.Program(target = 'executable', source = sources)
+program = env.Program(target = 'executable', source = sources + hwut)
 
 env.Alias('build', program)
 env.Alias('size', env.Size(program))

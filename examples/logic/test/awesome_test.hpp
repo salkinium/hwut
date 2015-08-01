@@ -19,9 +19,9 @@
  * along with hwut.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <unittest/testsuite.hpp>
+#include <hwut/testsuite.hpp>
 
-class AwesomeTest : public unittest::TestSuite
+class AwesomeTest : public hwut::TestSuite
 {
 public:
 	void testGetterSetter();
