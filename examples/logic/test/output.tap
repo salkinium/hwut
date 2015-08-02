@@ -1,0 +1,77 @@
+TAP version 13
+# unittests (Aug  1 2015, 20:12:54)
+# module: awesome_test
+ok 1
+	---
+	module: 'awesome_test'
+	function: 'testGetterSetter'
+	line: 29
+	type: 'assert equals'
+	args: 'awesome.getValue(), 0'
+	values: '0, 0'
+	...
+ok 2
+	---
+	module: 'awesome_test'
+	function: 'testGetterSetter'
+	line: 32
+	type: 'assert equals'
+	args: 'awesome.getValue(), 42'
+	values: '42, 42'
+	...
+not ok 3 # TODO
+	---
+	module: 'awesome_test'
+	function: 'testGetterSetter'
+	line: 33
+	type: 'assert equals'
+	args: 'awesome.getValue(), 43'
+	values: '42, 43'
+	...
+not ok 4
+	---
+	module: 'awesome_test'
+	function: 'testGetterSetter'
+	line: 34
+	type: 'assert equals delta'
+	args: 'awesome.getValue(), 43, 0.2'
+	values: '42, 43, 2.00000e-01'
+	...
+ok 5
+	---
+	module: 'awesome_test'
+	function: 'testGetterSetter'
+	line: 36
+	type: 'assert equals range'
+	args: 'awesome.getValue(), 40, 45'
+	values: '42, 40, 45'
+	...
+not ok 6
+	---
+	module: 'awesome_test'
+	function: 'testGetterSetter'
+	line: 37
+	type: 'assert equals range'
+	args: 'awesome.getValue() - 10, 40, 45'
+	values: '32, 40, 45'
+	...
+not ok 7
+	---
+	module: 'awesome_test'
+	function: 'testGetterSetter'
+	line: 39
+	type: 'assert true'
+	args: 'awesome.getValue() == 43'
+	values: 'false'
+	...
+not ok 8
+	---
+	module: 'awesome_test'
+	function: 'testGetterSetter'
+	line: 40
+	type: 'assert false'
+	args: 'awesome.getValue() == 42'
+	values: 'true'
+	...
+Failed 5/8 tests, 62% okay
+1..8
