@@ -36,6 +36,8 @@ main(void)
 	hwut::Reporter reporter(outputDevice);
 	hwut::Controller::instance().setReporter(reporter);
 
+	reporter.initialize();
+
 	// run tests
 {{tests}}
 

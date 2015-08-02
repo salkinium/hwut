@@ -25,6 +25,9 @@
 void
 AwesomeTest::testGetterSetter()
 {
+	uint8_t array1[10] = {0,1,2,3,4,5,6,7,8,9};
+	uint8_t array2[10] = {0,1,2,3,4,5,6,7,8,10};
+
 	Awesome awesome;
 	TEST_ASSERT_EQUALS(awesome.getValue(), 0);
 
@@ -38,4 +41,6 @@ AwesomeTest::testGetterSetter()
 
 	TEST_ASSERT_TRUE(awesome.getValue() == 43);
 	TEST_ASSERT_FALSE(awesome.getValue() == 42);
+
+	TEST_ASSERT_EQUALS_ARRAY(array1, array2, 10);
 }

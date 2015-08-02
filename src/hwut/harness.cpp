@@ -24,44 +24,48 @@
 
 namespace hwut
 {
-	FLASH_STORAGE_STRING(stringEqual) = " == ";
-	FLASH_STORAGE_STRING(stringDelta) = " ~ ";
-	FLASH_STORAGE_STRING(stringNotInRange) = " not in range ";
-	FLASH_STORAGE_STRING(stringFailBodyExpression) = "Expression not ";
-	FLASH_STORAGE_STRING(stringFailBodyEqual) = " not equal";
-	FLASH_STORAGE_STRING(stringFailBodyEqualFloat) = " with float eplison'\n";
-	FLASH_STORAGE_STRING(stringFailBodyEqualDelta) = " with delta ";
-	FLASH_STORAGE_STRING(stringFailBodyEnd) = "'\n";
+	FLASH_STORAGE_STRING(typeAssertEquals) = "assert equals";
+	FLASH_STORAGE_STRING(typeAssertEqualsDelta) = "assert equals delta";
+	FLASH_STORAGE_STRING(typeAssertInRange) = "assert in range";
+	FLASH_STORAGE_STRING(typeAssertTrue) = "assert true";
+	FLASH_STORAGE_STRING(typeAssertFalse) = "assert false";
+	FLASH_STORAGE_STRING(typeAssertArray) = "assert array";
+
+	FLASH_STORAGE_STRING(stringArgs) = "\n\targs: '";
+	FLASH_STORAGE_STRING(stringValues) = "'\n\tvalues: '";
+	FLASH_STORAGE_STRING(stringComma) = ", ";
+
+	FLASH_STORAGE_STRING(stringMessage) = "fail message'\n\tmessage: '";
+}
+
+using namespace xpcc::accessor;
+
+bool
+hwut::checkExpression(bool expr, bool expected, unsigned int line, xpcc::accessor::Flash<char> argument)
+{
+	bool pass = (expr == expected);
+
+	TEST_REPORTER__.report(pass, line, asFlash(expected ? hwut::typeAssertTrue : hwut::typeAssertFalse))
+		<< asFlash(hwut::stringArgs)
+		<< argument
+		<< asFlash(hwut::stringValues)
+		<< expr
+		<< '\'';
+
+	return pass;
 }
 
 bool
-hwut::checkExpression(bool expr, bool expected, unsigned int line, xpcc::accessor::Flash<char> checkString)
+hwut::checkEqual(const float& a, const float& b, unsigned int line, xpcc::accessor::Flash<char> argument)
 {
-	if (expr == expected) {
-		TEST_REPORTER__.reportPass(checkString) << xpcc::endl;
-		return true;
-	} else {
-		TEST_REPORTER__.reportFailure(checkString, line)
-			<< xpcc::accessor::asFlash(hwut::stringFailBodyExpression)
-			<< expected
-			<< xpcc::accessor::asFlash(hwut::stringFailBodyEnd);
-		return false;
-	}
-}
+	bool pass = (((a + TEST_FLOAT_EPISLON) >= b) and ((a - TEST_FLOAT_EPISLON) <= b));
 
-bool
-hwut::checkEqual(const float& a, const float& b, unsigned int line, xpcc::accessor::Flash<char> checkString)
-{
-	if (((a + TEST_FLOAT_EPISLON) >= b) and ((a - TEST_FLOAT_EPISLON) <= b))
-	{
-		TEST_REPORTER__.reportPass(checkString) << xpcc::endl;
-		return true;
-	}
-	else {
-		TEST_REPORTER__.reportFailure(checkString, line)
-			<< a << xpcc::accessor::asFlash(hwut::stringEqual) << b
-				<< xpcc::accessor::asFlash(hwut::stringFailBodyEqual)
-			<< xpcc::accessor::asFlash(hwut::stringFailBodyEqualFloat);
-		return false;
-	}
+	TEST_REPORTER__.report(pass, line, asFlash(hwut::typeAssertEquals))
+		<< asFlash(hwut::stringArgs)
+		<< argument
+		<< asFlash(hwut::stringValues)
+		<< a << asFlash(hwut::stringComma) << b
+		<< '\'';
+
+	return pass;
 }

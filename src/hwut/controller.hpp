@@ -36,7 +36,7 @@ namespace hwut
 	 * All macros form 'harness.hpp' use this class to determine the
 	 * active reporter.
 	 *
-	 * \author	Fabian Greif 
+	 * \author	Fabian Greif
 	 * \ingroup	unittest
 	 */
 	class Controller
@@ -64,7 +64,10 @@ namespace hwut
 		 *					to generate messages
 		 */
 		void
-		nextTestSuite(xpcc::accessor::Flash<char> name) const;
+		nextModule(xpcc::accessor::Flash<char> name) const;
+
+		void
+		nextFunction(xpcc::accessor::Flash<char> name) const;
 
 	private:
 		Controller();

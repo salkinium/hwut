@@ -58,16 +58,10 @@ namespace hwut
 		 * \param	name	Name of the test suite
 		 */
 		void
-		nextTestSuite(xpcc::accessor::Flash<char> name);
+		nextModule(xpcc::accessor::Flash<char> name);
 
-		/**
-		 * \brief	Report a passed test
-		 *
-		 * Doesn't generate any output, but increments the number of
-		 * passed tests
-		 */
-		xpcc::IOStream&
-		reportPass(xpcc::accessor::Flash<char> checkString);
+		void
+		nextFunction(xpcc::accessor::Flash<char> name);
 
 		/**
 		 * \brief	Reported a failed test
@@ -76,7 +70,7 @@ namespace hwut
 		 * be used to write some more specific information about the failure.
 		 */
 		xpcc::IOStream&
-		reportFailure(xpcc::accessor::Flash<char> checkString, unsigned int lineNumber);
+		report(bool pass, unsigned int lineNumber, xpcc::accessor::Flash<char> type);
 
 		/**
 		 * \brief	Writes a summary of all the tests
@@ -89,7 +83,8 @@ namespace hwut
 
 	private:
 		xpcc::IOStream outputStream;
-		xpcc::accessor::Flash<char> testName;
+		xpcc::accessor::Flash<char> testModule;
+		xpcc::accessor::Flash<char> testFunction;
 
 		uint_fast16_t testsPassed;
 		uint_fast16_t testsFailed;

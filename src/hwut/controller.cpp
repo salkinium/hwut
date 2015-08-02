@@ -39,7 +39,13 @@ hwut::Controller::getReporter() const
 }
 
 void
-hwut::Controller::nextTestSuite(xpcc::accessor::Flash<char> name) const
+hwut::Controller::nextModule(xpcc::accessor::Flash<char> name) const
 {
-	reporter->nextTestSuite(name);
+	reporter->nextModule(name);
+}
+
+void
+hwut::Controller::nextFunction(xpcc::accessor::Flash<char> name) const
+{
+	reporter->nextFunction(name);
 }

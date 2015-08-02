@@ -123,13 +123,14 @@ def unittest_action(target, source, env):
 		name_strings.append('FLASH_STORAGE_STRING(%s) = "%s";' % (test_name_string, attr['test_name']))
 
 		str = """\
-	hwut::Controller::instance().nextTestSuite(xpcc::accessor::asFlash(%s));
+	hwut::Controller::instance().nextModule(xpcc::accessor::asFlash(%s));
 	{
 		%s %s;
 		""" % (test_name_string, class_name, instance_name)
-		
+
 		for function_name in attr['functions']:
 			str += """
+		hwut::Controller::instance().nextFunction(xpcc::accessor::asFlash( INLINE_FLASH_STORAGE_STRING("%(function)s")));
 		%(instance)s.setUp();
 		%(instance)s.%(function)s();
 		%(instance)s.tearDown();

@@ -94,14 +94,17 @@
 
 namespace hwut
 {
-	EXTERN_FLASH_STORAGE_STRING(stringEqual);
-	EXTERN_FLASH_STORAGE_STRING(stringDelta);
-	EXTERN_FLASH_STORAGE_STRING(stringNotInRange);
-	EXTERN_FLASH_STORAGE_STRING(stringFailBodyExpression);
-	EXTERN_FLASH_STORAGE_STRING(stringFailBodyEqual);
-	EXTERN_FLASH_STORAGE_STRING(stringFailBodyEqualFloat);
-	EXTERN_FLASH_STORAGE_STRING(stringFailBodyEqualDelta);
-	EXTERN_FLASH_STORAGE_STRING(stringFailBodyEnd);
+	EXTERN_FLASH_STORAGE_STRING(typeAssertEquals);
+	EXTERN_FLASH_STORAGE_STRING(typeAssertEqualsDelta);
+	EXTERN_FLASH_STORAGE_STRING(typeAssertInRange);
+	EXTERN_FLASH_STORAGE_STRING(typeAssertTrue);
+	EXTERN_FLASH_STORAGE_STRING(typeAssertFalse);
+	EXTERN_FLASH_STORAGE_STRING(typeAssertArray);
+
+	EXTERN_FLASH_STORAGE_STRING(stringArgs);
+	EXTERN_FLASH_STORAGE_STRING(stringValues);
+	EXTERN_FLASH_STORAGE_STRING(stringComma);
+	EXTERN_FLASH_STORAGE_STRING(stringMessage);
 }
 
 #ifdef	HWUT_RETURN_ON_FAIL
@@ -116,65 +119,62 @@ namespace hwut
 {
 	// ------------------------------------------------------------------------
 	bool
-	checkExpression(bool expr, bool expected, unsigned int line, xpcc::accessor::Flash<char> checkString);
+	checkExpression(bool expr, bool expected, unsigned int line, xpcc::accessor::Flash<char> arguments);
 
 	// ------------------------------------------------------------------------
 	bool
-	checkEqual(const float& a, const float& b, unsigned int line, xpcc::accessor::Flash<char> checkString);
+	checkEqual(const float& a, const float& b, unsigned int line, xpcc::accessor::Flash<char> arguments);
 
 	// ------------------------------------------------------------------------
 	template <typename A, typename B>
 	bool
-	checkEqual(const A& a, const B& b, unsigned int line, xpcc::accessor::Flash<char> checkString)
+	checkEqual(const A& a, const B& b, unsigned int line, xpcc::accessor::Flash<char> arguments)
 	{
-		if (a == b) {
-			TEST_REPORTER__.reportPass(checkString) << xpcc::endl;
-			return true;
-		}
-		else {
-			TEST_REPORTER__.reportFailure(checkString, line)
-				<< a << xpcc::accessor::asFlash(hwut::stringEqual) << b
-				<< xpcc::accessor::asFlash(hwut::stringFailBodyEqual)
-				<< xpcc::accessor::asFlash(hwut::stringFailBodyEnd);
-			return false;
-		}
+		using namespace xpcc::accessor;
+		bool pass = (a == b);
+
+		TEST_REPORTER__.report(pass, line, asFlash(hwut::typeAssertEquals))
+			<< asFlash(hwut::stringArgs)
+			<< arguments
+			<< asFlash(hwut::stringValues)
+			<< a << asFlash(hwut::stringComma) << b
+			<< '\'';
+
+		return pass;
 	}
 
 	template <typename A, typename B, typename D>
 	bool
-	checkEqualDelta(const A& a, const B& b, const D& delta, unsigned int line, xpcc::accessor::Flash<char> checkString)
+	checkEqualDelta(const A& a, const B& b, const D& delta, unsigned int line, xpcc::accessor::Flash<char> arguments)
 	{
-		if (((a + delta) >= b) and ((a - delta) <= b))
-		{
-			TEST_REPORTER__.reportPass(checkString) << xpcc::endl;
-			return true;
-		}
-		else {
-			TEST_REPORTER__.reportFailure(checkString, line)
-				<< a << xpcc::accessor::asFlash(hwut::stringEqual) << b
-				<< xpcc::accessor::asFlash(hwut::stringFailBodyEqual)
-				<< xpcc::accessor::asFlash(hwut::stringFailBodyEqualDelta) << delta
-				<< xpcc::accessor::asFlash(hwut::stringFailBodyEnd);
-			return false;
-		}
+		using namespace xpcc::accessor;
+		bool pass = (((a + delta) >= b) and ((a - delta) <= b));
+
+		TEST_REPORTER__.report(pass, line, asFlash(hwut::typeAssertEquals))
+			<< asFlash(hwut::stringArgs)
+			<< arguments
+			<< asFlash(hwut::stringValues)
+			<< a << asFlash(hwut::stringComma) << b << asFlash(hwut::stringComma) << delta
+			<< '\'';
+
+		return pass;
 	}
 
 	template <typename T, typename B>
 	bool
-	checkRange(const T& value, const B& lower, const B& upper, unsigned int line, xpcc::accessor::Flash<char> checkString)
+	checkRange(const T& value, const B& lower, const B& upper, unsigned int line, xpcc::accessor::Flash<char> arguments)
 	{
-		if ((value >= lower) && (value <= upper))
-		{
-			TEST_REPORTER__.reportPass(checkString) << xpcc::endl;
-			return true;
-		}
-		else {
-			TEST_REPORTER__.reportFailure(checkString, line)
-				<< value << xpcc::accessor::asFlash(hwut::stringNotInRange)
-				<< '[' << lower << ',' << upper << ']'
-				<< xpcc::accessor::asFlash(hwut::stringFailBodyEnd);
-			return false;
-		}
+		using namespace xpcc::accessor;
+		bool pass = ((value >= lower) and (value <= upper));
+
+		TEST_REPORTER__.report(pass, line, asFlash(hwut::typeAssertEquals))
+			<< asFlash(hwut::stringArgs)
+			<< arguments
+			<< asFlash(hwut::stringValues)
+			<< value << asFlash(hwut::stringComma) << lower << asFlash(hwut::stringComma) << upper
+			<< '\'';
+
+		return pass;
 	}
 
 	// ------------------------------------------------------------------------
@@ -182,36 +182,45 @@ namespace hwut
 	inline void
 	printArray(xpcc::IOStream& stream, unsigned int start, unsigned int count, const T& array)
 	{
+		using namespace xpcc::accessor;
 		stream << '[';
 		for (unsigned int i = start; i < (start + count); ++i) {
 			stream << array[i];
 			if (i != start + count - 1) {
-				stream << ',' << ' ';
+				stream << asFlash(hwut::stringComma);
 			}
 		}
-		stream << ']' << '\n';
+		stream << ']';
 	}
 
 	template <typename A, typename B>
 	bool
-	checkArray(const A& a, const B& b, unsigned int line, xpcc::accessor::Flash<char> checkString, std::size_t count, std::size_t start = 0)
+	checkArray(const A& a, const B& b, unsigned int line, xpcc::accessor::Flash<char> arguments, std::size_t count, std::size_t start = 0)
 	{
+		using namespace xpcc::accessor;
 		for (std::size_t i = start; i < (start + count); ++i)
 		{
 			if (a[i] != b[i])
 			{
-				xpcc::IOStream& stream = TEST_REPORTER__.reportFailure(checkString, line);
-
-				stream << '\n';
+				xpcc::IOStream& stream = TEST_REPORTER__.report(false, line, asFlash(hwut::typeAssertArray));
+				stream	<< asFlash(hwut::stringArgs)
+						<< arguments
+						<< asFlash(hwut::stringValues);
 
 				printArray(stream, start, count, a);
+				stream << asFlash(hwut::stringComma);
 				printArray(stream, start, count, b);
-				stream << xpcc::accessor::asFlash(hwut::stringFailBodyEnd);
+				stream << '\'';
 				return false;
 			}
 		}
 
-		TEST_REPORTER__.reportPass(checkString) << xpcc::endl;
+		xpcc::IOStream& stream = TEST_REPORTER__.report(true, line, asFlash(hwut::typeAssertArray));
+		stream	<< asFlash(hwut::stringArgs)
+				<< arguments
+				<< asFlash(hwut::stringValues);
+		printArray(stream, start, count, a);
+		stream << '\'';
 		return true;
 	}
 }
@@ -222,32 +231,32 @@ namespace hwut
 
 #define	TEST_ASSERT_FALSE(expr)	\
 	TEST_RETURN__(::hwut::checkExpression((expr), false,  __LINE__, \
-		xpcc::accessor::asFlash( INLINE_FLASH_STORAGE_STRING( "!(" STRINGIFY(expr) ")" ) )  ))
+		xpcc::accessor::asFlash( INLINE_FLASH_STORAGE_STRING( STRINGIFY(expr) ) )  ))
 
 #define	TEST_ASSERT_EQUALS(x, y) \
 	TEST_RETURN__(::hwut::checkEqual((x), (y), __LINE__, \
-		xpcc::accessor::asFlash( INLINE_FLASH_STORAGE_STRING( STRINGIFY(x) " == " STRINGIFY(y) ) )  ))
+		xpcc::accessor::asFlash( INLINE_FLASH_STORAGE_STRING( STRINGIFY(x) ", " STRINGIFY(y) ) )  ))
 
 #define	TEST_ASSERT_EQUALS_FLOAT(x, y) \
 	TEST_RETURN__(::hwut::checkEqual(static_cast<float>(x), static_cast<float>(y), __LINE__, \
-		xpcc::accessor::asFlash( INLINE_FLASH_STORAGE_STRING( STRINGIFY(x) " == " STRINGIFY(y) ) )  ))
+		xpcc::accessor::asFlash( INLINE_FLASH_STORAGE_STRING( STRINGIFY(x) ", " STRINGIFY(y) ) )  ))
 
 #define	TEST_ASSERT_EQUALS_DELTA(x, y, d) \
 	TEST_RETURN__(::hwut::checkEqualDelta((x), (y), (d), __LINE__, \
-		xpcc::accessor::asFlash( INLINE_FLASH_STORAGE_STRING( STRINGIFY(x) " == " STRINGIFY(y) " ~ " STRINGIFY(d)) )  ))
+		xpcc::accessor::asFlash( INLINE_FLASH_STORAGE_STRING( STRINGIFY(x) ", " STRINGIFY(y) ", " STRINGIFY(d)) )  ))
 
 #define	TEST_ASSERT_EQUALS_RANGE(value, lower, upper) \
 	TEST_RETURN__(::hwut::checkRange((value), (lower), (upper), __LINE__, \
-		xpcc::accessor::asFlash( INLINE_FLASH_STORAGE_STRING( STRINGIFY(value) " in [" STRINGIFY(lower) ", " STRINGIFY(upper) "]") )  ))
+		xpcc::accessor::asFlash( INLINE_FLASH_STORAGE_STRING( STRINGIFY(value) ", " STRINGIFY(lower) ", " STRINGIFY(upper)) )  ))
 
 #define	TEST_ASSERT_EQUALS_ARRAY(x, y, count, ...) \
 	TEST_RETURN__(::hwut::checkArray((x), (y), __LINE__, \
-		xpcc::accessor::asFlash( INLINE_FLASH_STORAGE_STRING( STRINGIFY(x) " == " STRINGIFY(y) " L=" STRINGIFY(count) )), count, \
+		xpcc::accessor::asFlash( INLINE_FLASH_STORAGE_STRING( STRINGIFY(x) ", " STRINGIFY(y) ", " STRINGIFY(count) )), count, \
 		##__VA_ARGS__))
 
 #define	TEST_FAIL(msg) \
-	do {	TEST_REPORTER__.reportFailure(xpcc::accessor::asFlash( INLINE_FLASH_STORAGE_STRING("")), __LINE__) \
-			<< msg << '\n'; \
+	do {	TEST_REPORTER__.report(false, __LINE__, xpcc::accessor::asFlash(hwut::stringMessage)) \
+			<< msg << '\''; \
 	} while (0); \
 	TEST_RETURN__((void) false)
 

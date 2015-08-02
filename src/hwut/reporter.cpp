@@ -21,30 +21,36 @@
 
 #include "reporter.hpp"
 
-namespace
+namespace report
 {
-	FLASH_STORAGE_STRING(tapVersion) = "TAP version 13\n";
-	FLASH_STORAGE_STRING(tapDate) = "# Unittests (" __DATE__ ", " __TIME__")\n";
-	FLASH_STORAGE_STRING(tapTests) = "1..";
-	FLASH_STORAGE_STRING(tapHash) = "# ";
-	FLASH_STORAGE_STRING(tapDash) = " - ";
-	FLASH_STORAGE_STRING(tapFailLine) = "\n\t---\n\tline: ";
-	FLASH_STORAGE_STRING(tapFailMessage) = "\n\tmessage: '";
+	FLASH_STORAGE_STRING(date) = "\n# HWUT tests (" __DATE__ ", " __TIME__")";
+	FLASH_STORAGE_STRING(invalid) = "Invalid";
+}
 
-	FLASH_STORAGE_STRING(tapNotOk) = "not ok ";
-	FLASH_STORAGE_STRING(tapOk) = "ok ";
+namespace tap
+{
 
-	FLASH_STORAGE_STRING(reportListFailures) = "\nFAILED tests 1, N, TODO";
-	FLASH_STORAGE_STRING(reportPassed) = "\nPassed ";
+	FLASH_STORAGE_STRING(version) = "TAP version 13";
+	FLASH_STORAGE_STRING(plan) = "1..";
+
+	FLASH_STORAGE_STRING(descriptionModule) = "\n\t---\n\tmodule: '";
+	FLASH_STORAGE_STRING(descriptionFunction) = "'\n\tfunction: '";
+	FLASH_STORAGE_STRING(descriptionLine) = "'\n\tline: ";
+	FLASH_STORAGE_STRING(descriptionType) = "\n\ttype: '";
+	FLASH_STORAGE_STRING(descriptionEnd) = "\n\t...";
+
+	FLASH_STORAGE_STRING(notOk) = "\nnot ok ";
+	FLASH_STORAGE_STRING(ok) = "\nok ";
+
 	FLASH_STORAGE_STRING(reportFailed) = "\nFailed ";
 	FLASH_STORAGE_STRING(reportTests) = " tests, ";
 	FLASH_STORAGE_STRING(reportPercent) = "\% okay";
-
-	FLASH_STORAGE_STRING(invalidName) = "Invalid";
 }
 
 hwut::Reporter::Reporter(xpcc::IODevice& device) :
-	outputStream(device), testName(xpcc::accessor::asFlash(invalidName)),
+	outputStream(device),
+	testModule(xpcc::accessor::asFlash(report::invalid)),
+	testFunction(xpcc::accessor::asFlash(report::invalid)),
 	testsPassed(0), testsFailed(0)
 {
 }
@@ -52,62 +58,60 @@ hwut::Reporter::Reporter(xpcc::IODevice& device) :
 void
 hwut::Reporter::initialize()
 {
-	outputStream << xpcc::accessor::asFlash(tapVersion)
-				 << xpcc::accessor::asFlash(tapDate);
+	outputStream << xpcc::accessor::asFlash(tap::version)
+				 << xpcc::accessor::asFlash(report::date);
 }
 
 void
-hwut::Reporter::nextTestSuite(xpcc::accessor::Flash<char> name)
+hwut::Reporter::nextModule(xpcc::accessor::Flash<char> name)
 {
-	testName = name;
-	outputStream << xpcc::accessor::asFlash(tapHash)
-				 << testName
-				 << xpcc::endl;
+	testModule = name;
+}
+
+void
+hwut::Reporter::nextFunction(xpcc::accessor::Flash<char> name)
+{
+	testFunction = name;
 }
 
 xpcc::IOStream&
-hwut::Reporter::reportPass(xpcc::accessor::Flash<char> checkString)
+hwut::Reporter::report(bool pass, unsigned int lineNumber, xpcc::accessor::Flash<char> type)
 {
-	testsPassed++;
-	outputStream << xpcc::accessor::asFlash(tapOk)
-				 << (testsPassed + testsFailed)
-				 << xpcc::accessor::asFlash(tapDash)
-				 << checkString;
-	return outputStream;
-}
+	if (pass)	testsPassed++;
+	else		testsFailed++;
 
-xpcc::IOStream&
-hwut::Reporter::reportFailure(xpcc::accessor::Flash<char> checkString, unsigned int lineNumber)
-{
-	testsFailed++;
-	outputStream << xpcc::accessor::asFlash(tapNotOk)
+	if (testsPassed + testsFailed > 1) outputStream << xpcc::accessor::asFlash(tap::descriptionEnd);
+
+	outputStream << xpcc::accessor::asFlash(pass ? tap::ok : tap::notOk)
 				 << (testsPassed + testsFailed)
-				 << xpcc::accessor::asFlash(tapDash)
-				 << checkString
-				 << xpcc::accessor::asFlash(tapFailLine)
+				 << xpcc::accessor::asFlash(tap::descriptionModule)
+				 << testModule
+				 << xpcc::accessor::asFlash(tap::descriptionFunction)
+				 << testFunction
+				 << xpcc::accessor::asFlash(tap::descriptionLine)
 				 << lineNumber
-				 << xpcc::accessor::asFlash(tapFailMessage);
+				 << xpcc::accessor::asFlash(tap::descriptionType)
+				 << type << '\'';
 	return outputStream;
 }
 
 void
 hwut::Reporter::printSummary()
 {
-	outputStream << xpcc::accessor::asFlash(tapTests) << (testsFailed + testsPassed) << xpcc::endl;
-
+	outputStream << xpcc::accessor::asFlash(tap::descriptionEnd);
 	if (testsFailed > 0)
 	{
 		uint_fast16_t percent = (testsFailed * 100) / (testsFailed + testsPassed);
 
-		outputStream << xpcc::accessor::asFlash(reportListFailures)
-					 // << list failed cases
-					 << xpcc::accessor::asFlash(reportFailed)
+		outputStream << xpcc::accessor::asFlash(tap::reportFailed)
 					 << testsFailed
 					 << '/'
 					 << (testsFailed + testsPassed)
-					 << xpcc::accessor::asFlash(reportTests)
+					 << xpcc::accessor::asFlash(tap::reportTests)
 					 << percent
-					 << xpcc::accessor::asFlash(reportPercent)
+					 << xpcc::accessor::asFlash(tap::reportPercent)
 					 << xpcc::endl;
 	}
+
+	outputStream << xpcc::accessor::asFlash(tap::plan) << (testsFailed + testsPassed) << xpcc::endl;
 }
